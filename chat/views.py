@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework.generics import ListCreateAPIView
 
-# Create your views here.
+from .models import Message
+from .serializers import MessageSerializer
+
+
+class MessageListCreateAPIView(ListCreateAPIView):
+    queryset = Message.objects.all().order_by("-timestamp")
+    serializer_class = MessageSerializer
