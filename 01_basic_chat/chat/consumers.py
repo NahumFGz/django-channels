@@ -1,5 +1,6 @@
 import json
 
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from .models import Message
@@ -25,14 +26,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         username = data["username"]
         content = data["content"]
 
-        # Guardar mensaje en la base de datos
-        message = Message.objects.create(username=username, content=content)
+        # Guardar mensaje en la base de datos usando sync_to_async
+        message = await sync_to_async(Message.objects.create)(username=username, content=content)
 
         # Serializar mensaje
         serializer = MessageSerializer(message)
 
         # Enviar mensaje al grupo
-        await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": serializer.data})
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "chat_message",
+                "message": serializer.data,
+            },
+        )
 
     # Manejar mensajes desde el grupo
     async def chat_message(self, event):

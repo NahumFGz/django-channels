@@ -1,0 +1,6 @@
+# Test para el WebSocket
+
+{
+    "username": "Tester",
+    "content": "Hello, WebSocket!"
+}
